@@ -53,6 +53,14 @@ typings/
 
 # Yarn Integrity file
 .yarn-integrity
+build
+
+# Clevis
+.clevis
+.address
+.blockNumber
+.compiled
+.bytecode
 
 # dotenv environment variables file
 .env

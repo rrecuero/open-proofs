@@ -1,0 +1,40 @@
+{
+  "name": "ethwrapper",
+  "version": "1.0.0",
+  "description": "Ethwrapper connector for fstack-dapp-template",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "heroku-postbuild": "cd client/ && npm install && npm install --only=dev --no-shrinkwrap && npm run build",
+    "postinstall": "npm install --prefix backend && npm install --prefix client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rrecuero/fstack-ethdapp-template"
+  },
+  "keywords": [
+    "truffle",
+    "ganache",
+    "openzeppelin",
+    "aragon"
+  ],
+  "author": "Ramon Recuero",
+  "license": "ISC",
+  "bugs": {
+    "url": "git+https://github.com/rrecuero/fstack-ethdapp-template/issues"
+  },
+  "homepage": "git+https://github.com/rrecuero/fstack-ethdapp-template#readme",
+  "dependencies": {
+    "chai": "^4.2.0",
+    "chai-bignumber": "^2.0.2",
+    "clevis": "0.0.94",
+    "erc721x": "^1.0.1",
+    "ethjs-abi": "^0.2.1",
+    "lodash": "^4.17.11",
+    "openzeppelin-solidity": "^2.0.0",
+    "web3": "^1.0.0-beta.36",
+    "web3-utils": "^1.0.0-beta.36"
+  }
+}
