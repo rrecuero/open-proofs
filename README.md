@@ -107,3 +107,15 @@ Here are some use cases we foresee by creating an identity layer with non-transf
 ### Conclusion
 
 Inspired by projects like MetaTx and Universal Logins, open-proofs is designed so any project can craft digitally scarce badges without the need to install MetaMask, buy ETH, and deploy smart contracts. Creators will just need to pay enough to cover gas costs. Proof will use meta-t/xs so users retain custody of the badge up the entire time throughout the minting process.
+
+## Inspiration & References
+
+- [ERC-721 Anatomy](https://medium.com/crypto-currently/the-anatomy-of-erc721-e9db77abfc24?ref=producthunt)
+- [ERC-721 Metadata Standards](https://medium.com/blockchain-manchester/erc-721-metadata-standards-and-ipfs-94b01fea2a89)
+- [Identity and NFTs](https://medium.com/originprotocol/managing-identity-with-a-ui-for-erc-725-5c7422b38c09)
+- [ERC-721x](https://erc721x.org/)
+- [Universal Logins](https://medium.com/@avsa/universal-logins-first-demo-1dc8b17a8de7)
+
+## About
+
+Project created by [Ramón Recuero](https://www.ramonrecuero.com) in collaboration with Bryan Flynn and Adam Breckler from [Xpo](https://xpo.network).
