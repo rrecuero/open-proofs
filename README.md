@@ -5,9 +5,9 @@ open-proofs is a DIY badge creation tool built for communities to easily design 
 
 **Quick Links:**
 
-- [open-proofs Reference Implementation](contracts/Badges/Badges.sol)
+- [Open-Proofs Reference Implementation](contracts/Badges/Badges.sol)
 
-- [ERC721FUll Interface](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/token/ERC721/IERC721Full.sol)
+- [ERC721Full Interface](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/token/ERC721/IERC721Full.sol)
 
 - [ERC721 Metadata Mintable](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/token/ERC721/ERC721MetadataMintable.sol)
 
@@ -88,7 +88,7 @@ Badges are a step towards verifiable & scarce on-chain achievements. Badges will
 
 Our Approach: Extending ERC721, ERC721Enumerable and ERC721MetadataMintable to support unique badges.
 
-Our contract is compatible with the ERC721 Interface.
+Our contract is compatible with the ERC721 Interface, meaning all the functions are callable but please take into account that transfers are disabled.
 
 ### Real World Usage
 
