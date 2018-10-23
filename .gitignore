@@ -56,11 +56,11 @@ typings/
 build
 
 # Clevis
-.clevis
-.address
-.blockNumber
-.compiled
-.bytecode
+*.clevis
+*.address
+*.blockNumber
+*.compiled
+*.bytecode
 
 # dotenv environment variables file
 .env

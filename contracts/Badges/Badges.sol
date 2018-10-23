@@ -5,12 +5,16 @@ import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Holder.sol';
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol';
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import 'openzeppelin-solidity/contracts/introspection/ERC165.sol';
 import 'openzeppelin-solidity/contracts/utils/Address.sol';
 
 contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, ERC721Holder {
 
   using SafeMath for uint256;
   using Address for address;
+
+  bytes4 private constant _InterfaceId_ERC721Metadata = 0x5b5e139f;
+  bytes4 private constant _InterfaceId_ERC721 = 0x80ac58cd;
 
   /*
       Badge metadata format
@@ -81,6 +85,8 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
     ERC721Full("ProjectProof", "PROOF")
     public
   {
+    _registerInterface(_InterfaceId_ERC721Metadata);
+    _registerInterface(_InterfaceId_ERC721);
   }
 
   function toString(address x) internal pure returns (string) {
@@ -139,7 +145,9 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
     });
     _communityId = communities.push(_newCommunity).sub(1);
     _ownedCommunity[to] = _communityId;
-    addMinter(to);
+    if (!isMinter(to)) {
+      addMinter(to);
+    }
     emit NewCommunity(_communityId, name, url);
     return _communityId;
   }
