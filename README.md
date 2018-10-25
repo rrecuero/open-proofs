@@ -1,4 +1,4 @@
-# open-proofs: Unique Non Transferable NFTs - Badges
+# open-proofs: Unique Non Transferable NFTs (NFNTs)  - Badges
 open-proofs is a DIY badge creation tool built for communities to easily design and mint their own non-fungible, non-transferable badges and distribute them to within their own communities and applications for various achievements.
 
 [Website](http://openproofs.com/)
