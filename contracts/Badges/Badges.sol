@@ -225,7 +225,7 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
     return _templateQuantities[templateId];
   }
 
-  function createBadge(uint256 templateId, string tokenURI) public onlyTemplateOwner(templateId) returns (uint256 _tokenId) {
+  function createBadge(address to, uint256 templateId, string tokenURI) public onlyTemplateOwner(templateId) returns (uint256 _tokenId) {
     // Community has to exist
     _hasCommunity(msg.sender);
     _hasTemplate(msg.sender, templateId);
@@ -233,7 +233,7 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
       "You have reached the limit of NFTs");
     _tokenId = totalSupply();
     mintWithTokenURI(
-      msg.sender,
+      to,
       _tokenId,
       tokenURI
     );
