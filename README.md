@@ -48,7 +48,7 @@ contract Badges {
   // Badges
   function getBadgeTemplate(uint256 tokenId) public view returns (uint256);
   function getBadgeTemplateQuantity(uint256 templateId) public view returns (uint256);
-  function createBadge(uint256 templateId, string tokenURI) public onlyTemplateOwner(templateId) returns (uint256 _tokenId);
+  function createBadge(address to, uint256 templateId, string tokenURI) public onlyTemplateOwner(templateId) returns (uint256 _tokenId);
   function burnBadge(uint256 tokenId) public;
 
   // Events
