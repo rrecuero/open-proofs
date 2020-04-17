@@ -32,7 +32,7 @@
     "clevis": "0.0.94",
     "erc721x": "^1.0.1",
     "ethjs-abi": "^0.2.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "openzeppelin-solidity": "^2.0.0",
     "web3": "^1.0.0-beta.36",
     "web3-utils": "^1.0.0-beta.36"
