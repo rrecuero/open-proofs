@@ -1,12 +1,13 @@
-pragma solidity ^0.4.24;
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol';
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721MetadataMintable.sol';
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Holder.sol';
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol';
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import 'openzeppelin-solidity/contracts/introspection/ERC165.sol';
-import 'openzeppelin-solidity/contracts/utils/Address.sol';
+pragma solidity ^0.5.0;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721MetadataMintable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721Holder.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721Burnable.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts/introspection/ERC165.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, ERC721Holder {
 
@@ -89,7 +90,7 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
     _registerInterface(_InterfaceId_ERC721);
   }
 
-  function toString(address x) internal pure returns (string) {
+  function toString(address x) internal pure returns (string memory) {
     bytes memory b = new bytes(20);
     for (uint i = 0; i < 20; i++)
         b[i] = byte(uint8(uint(x) / (2**(8*(19 - i)))));
@@ -115,17 +116,17 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
 
   // Getters
 
-  function getCommunity(uint256 communityId) public view onlyOwner returns (uint256 _communityId, string name, string url) {
+  function getCommunity(uint256 communityId) public view onlyOwner returns (uint256 _communityId, string memory name, string memory url) {
     require(getCommunitiesCount() > communityId, "No community with that id");
     Community memory mycommunity = communities[communityId];
     return (_communityId, mycommunity.name, mycommunity.url);
   }
 
-  function getMyCommunity() public view onlyMinter returns (uint256 _communityId, string name, string url) {
+  function getMyCommunity() public view onlyMinter returns (uint256 _communityId, string memory name, string memory url) {
     return getCommunity(_ownedCommunity[msg.sender]);
   }
 
-  function getTemplate(uint256 templateId) public view returns (string name, string description, string image, uint256 limit) {
+  function getTemplate(uint256 templateId) public view returns (string memory name, string memory description, string memory image, uint256 limit) {
     require(templates.length > templateId, "No template with that id");
     BadgeTemplate memory template = templates[templateId];
     return (template.name, template.description, template.image, template.limit);
@@ -137,7 +138,7 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
     return communities.length;
   }
 
-  function createCommunity(address to, string name, string url) public onlyOwner returns (uint256 _communityId) {
+  function createCommunity(address to, string memory name, string memory url) public onlyOwner returns (uint256 _communityId) {
     require(getCommunitiesCount() <= _ownedCommunity[to], "You already own a community");
     Community memory _newCommunity = Community({
        name: name,
@@ -169,7 +170,7 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
     return templates.length;
   }
 
-  function createTemplate(string name, string description, string image, uint256 limit) public onlyMinter returns (uint256 _templateId) {
+  function createTemplate(string memory name, string memory description, string memory image, uint256 limit) public onlyMinter returns (uint256 _templateId) {
     // Community has to exist
     _hasCommunity(msg.sender);
     BadgeTemplate memory _newTemplate = BadgeTemplate({
@@ -225,7 +226,7 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
     return _templateQuantities[templateId];
   }
 
-  function createBadge(address to, uint256 templateId, string tokenURI) public onlyTemplateOwner(templateId) returns (uint256 _tokenId) {
+  function createBadge(address to, uint256 templateId, string memory tokenURI) public onlyTemplateOwner(templateId) returns (uint256 _tokenId) {
     // Community has to exist
     _hasCommunity(msg.sender);
     _hasTemplate(msg.sender, templateId);
@@ -275,7 +276,7 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
     address from,
     address to,
     uint256 tokenId,
-    bytes _data
+    bytes memory _data
   )
     public
   {
