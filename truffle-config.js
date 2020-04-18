@@ -1,8 +1,9 @@
-const HDWalletProvider = require('truffle-hdwallet-provider')
-const fs = require("fs")
-const { join } = require('path')
+//const HDWalletProvider = require('truffle-hdwallet-provider')
+//const fs = require("fs")
+//const { join } = require('path')
 
 // First read in the secrets.json to get our mnemonic
+/*
 let secrets;
 let mnemonic;
 
@@ -18,6 +19,7 @@ if (fs.existsSync(filename)) {
     "this will fail. Otherwise, you can ignore this message!");
   mnemonic = "";
 }
+*/
 
  module.exports = {
    networks: {
