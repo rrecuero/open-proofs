@@ -1,22 +1,23 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721MetadataMintable.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721Holder.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Burnable.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/ownership/Ownable.sol";
-import "@openzeppelin/contracts/introspection/ERC165.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721Holder.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, ERC721Holder {
+contract Badges is Ownable, AccessControl, ERC721, ERC721Burnable, ERC721Holder {
 
   using SafeMath for uint256;
   using Address for address;
 
+  // Create a new role identifier for the minter role
+  bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+
+  /* already included in ERC721.sol
   bytes4 private constant _InterfaceId_ERC721Metadata = 0x5b5e139f;
   bytes4 private constant _InterfaceId_ERC721 = 0x80ac58cd;
-
+  */
   /*
       Badge metadata format
       {
@@ -83,12 +84,15 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
 
   constructor()
     Ownable()
-    ERC721Full("ProjectProof", "PROOF")
+    ERC721("ProjectProof", "PROOF")
     public
   {
+    /* already included in ERC721.sol
     _registerInterface(_InterfaceId_ERC721Metadata);
     _registerInterface(_InterfaceId_ERC721);
+    */
   }
+  /* function toString() already included in OpenZeppelin v3.0.0 in /utils/Strings.sol
 
   function toString(address x) internal pure returns (string memory) {
     bytes memory b = new bytes(20);
@@ -96,11 +100,23 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
         b[i] = byte(uint8(uint(x) / (2**(8*(19 - i)))));
     return string(b);
   }
+  */
+  // cloned form OpenZeppelin v2.5
+  modifier onlyMinter() {
+      require(hasRole(MINTER_ROLE, msg.sender), "Caller is not a minter");
+      _;
+    }
 
   modifier onlyTemplateOwner(uint _templateId) {
     require(bytes(templates[_templateId].name).length != 0, "Template needs to exist");
     require(templates[_templateId].owner == msg.sender, "You do not own this template");
     _;
+  }
+  // cloned from OpenZeppelin v2.5
+  function mintWithTokenURI(address to, uint256 tokenId, string memory tokenURI) public onlyMinter returns (bool) {
+    _mint(to, tokenId);
+    _setTokenURI(tokenId, tokenURI);
+    return true;
   }
 
   function _hasCommunity(address add) internal view returns (bool) {
@@ -144,10 +160,11 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
        name: name,
        url: url
     });
-    _communityId = communities.push(_newCommunity).sub(1);
+    communities.push(_newCommunity);
+    _communityId = communities.length.sub(1);
     _ownedCommunity[to] = _communityId;
-    if (!isMinter(to)) {
-      addMinter(to);
+    if (!hasRole(MINTER_ROLE, to)) {
+      _setupRole(MINTER_ROLE, to);
     }
     emit NewCommunity(_communityId, name, url);
     return _communityId;
@@ -159,9 +176,10 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
     require(_ownedCommunity[to] == communityId);
     Community memory lastCommunity = communities[communities.length.sub(1)];
     communities[communityId] = lastCommunity;
-    communities.length --;
+    communities.pop();
     // Can't remove the access here need to call it from somewhere else
     // _removeMinter(to);
+    revokeRole(MINTER_ROLE, to);
   }
 
   // Templates
@@ -180,10 +198,11 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
        image: image,
        limit: limit
     });
-    _templateId = templates.push(_newTemplate).sub(1);
+    templates.push(_newTemplate);
+    _templateId = templates.length.sub(1);
     _ownedCommunity[msg.sender] = _templateId;
-    uint256 length = _communityTemplates[msg.sender].push(_templateId).sub(1);
-    _communityTemplatesIndex[_templateId] = length;
+    _communityTemplates[msg.sender].push(_templateId);
+    _communityTemplatesIndex[_templateId] = _communityTemplates[msg.sender].length.sub(1);
     emit NewTemplate(_templateId, name, description, image, limit);
     return _templateId;
   }
@@ -201,7 +220,7 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
 
     _communityTemplates[msg.sender][templateIndex] = lastTemplate;
     // This also deletes the contents at the last position of the array
-    _communityTemplates[msg.sender].length--;
+    _communityTemplates[msg.sender].pop();
 
     // Note that this will handle single-element arrays. In that case, both templateIndex and lastTemplateIndex are going to
     // be zero. Then we can make sure that we will remove templateId from the _communityTemplates list since we are first swapping
@@ -211,7 +230,7 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
     _communityTemplatesIndex[lastTemplate] = templateIndex;
 
     templates[templateId] = templates[templates.length.sub(1)];
-    templates.length --;
+    templates.pop();
   }
 
   // Badges
@@ -238,8 +257,8 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
       _tokenId,
       tokenURI
     );
-    uint256 length = _communityTokens[msg.sender].push(_tokenId).sub(1);
-    _communityTokensIndex[_tokenId] = length;
+    _communityTokens[msg.sender].push(_tokenId);
+    _communityTokensIndex[_tokenId] = _communityTokens[msg.sender].length.sub(1);
     // Increase the quantities
     _tokenTemplates[_tokenId] = templateId;
     _templateQuantities[templateId] = _templateQuantities[templateId].add(1);
@@ -253,6 +272,11 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
     _templateQuantities[templateId] = _templateQuantities[templateId].sub(1);
   }
 
+  function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal virtual override {
+    super._beforeTokenTransfer(from, to, tokenId);
+    require(!true, "ERC721: token transfer disabled");
+  }
+  /*
   function transferFrom(
     address from,
     address to,
@@ -282,5 +306,6 @@ contract Badges is Ownable, ERC721Full, ERC721MetadataMintable, ERC721Burnable, 
   {
     require(1 != 0 , "Proof Badges transfers are disabled");
   }
+  */
 
 }
