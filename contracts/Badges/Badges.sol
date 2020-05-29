@@ -91,6 +91,7 @@ contract Badges is Ownable, AccessControl, ERC721Burnable, ERC721Holder {
     _registerInterface(_InterfaceId_ERC721Metadata);
     _registerInterface(_InterfaceId_ERC721);
     */
+    _setupRole(DEFAULT_ADMIN_ROLE, owner());
   }
   /* function toString() already included in OpenZeppelin v3.0.0 in /utils/Strings.sol
 
@@ -112,6 +113,17 @@ contract Badges is Ownable, AccessControl, ERC721Burnable, ERC721Holder {
     require(templates[_templateId].owner == msg.sender, "You do not own this template");
     _;
   }
+
+  function addMinter(address account) public onlyOwner returns (bool) {
+    grantRole(MINTER_ROLE, account);
+    return true;
+  }
+
+  function removeMinter(address account) public onlyOwner returns (bool) {
+    revokeRole(MINTER_ROLE, account);
+    return true;
+  }
+
   // cloned from OpenZeppelin v2.5
   function mintWithTokenURI(address to, uint256 tokenId, string memory tokenURI) public onlyMinter returns (bool) {
     _mint(to, tokenId);
@@ -163,9 +175,6 @@ contract Badges is Ownable, AccessControl, ERC721Burnable, ERC721Holder {
     communities.push(_newCommunity);
     _communityId = communities.length.sub(1);
     _ownedCommunity[to] = _communityId;
-    if (!hasRole(MINTER_ROLE, to)) {
-      _setupRole(MINTER_ROLE, to);
-    }
     emit NewCommunity(_communityId, name, url);
     return _communityId;
   }
@@ -179,7 +188,6 @@ contract Badges is Ownable, AccessControl, ERC721Burnable, ERC721Holder {
     communities.pop();
     // Can't remove the access here need to call it from somewhere else
     // _removeMinter(to);
-    revokeRole(MINTER_ROLE, to);
   }
 
   // Templates
