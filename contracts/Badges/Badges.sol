@@ -1,4 +1,5 @@
-pragma solidity ^0.6.0;
+/// SPDX-License-Identifier: BSD-3-Clause
+pragma solidity 0.6.8;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Burnable.sol";
