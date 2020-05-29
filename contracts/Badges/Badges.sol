@@ -271,40 +271,12 @@ contract Badges is Ownable, AccessControl, ERC721Burnable, ERC721Holder {
     _templateQuantities[templateId] = _templateQuantities[templateId].sub(1);
   }
 
-  function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal virtual override {
-    super._beforeTokenTransfer(from, to, tokenId);
-    require(!true, "ERC721: token transfer disabled");
-  }
-  /*
-  function transferFrom(
-    address from,
-    address to,
-    uint256 tokenId
-  )
-    public
-  {
-    require(1 != 0 , "Proof Badges transfers are disabled");
-  }
-
-  function safeTransferFrom(
-    address from,
-    address to,
-    uint256 tokenId
-  )
-    public
-  {
-    require(1 != 0 , "Proof Badges transfers are disabled");
-  }
-  function safeTransferFrom(
-    address from,
-    address to,
-    uint256 tokenId,
-    bytes memory _data
-  )
-    public
-  {
-    require(1 != 0 , "Proof Badges transfers are disabled");
-  }
-  */
+    /// @notice ERC721 _transfer() Disabled
+    /// @dev _transfer() has been overriden
+    /// @dev reverts on transferFrom() and safeTransferFrom()
+    function _transfer(address from, address to, uint256 tokenId) internal override {
+      require(!true, "ERC721: token transfer disabled");
+      super._transfer(from, to, tokenId);
+    }
 
 }
