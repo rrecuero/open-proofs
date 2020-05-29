@@ -6,10 +6,9 @@ import "@openzeppelin/contracts/token/ERC721/ERC721Holder.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract Badges is Ownable, AccessControl, ERC721, ERC721Burnable, ERC721Holder {
+contract Badges is Ownable, AccessControl, ERC721Burnable, ERC721Holder {
 
   using SafeMath for uint256;
-  using Address for address;
 
   // Create a new role identifier for the minter role
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
