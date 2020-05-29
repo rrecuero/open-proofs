@@ -251,24 +251,23 @@ contract Badges is Ownable, AccessControl, ERC721Burnable, ERC721Holder {
     require(_templateQuantities[templateId] < templates[templateId].limit,
       "You have reached the limit of NFTs");
     _tokenId = totalSupply();
-    mintWithTokenURI(
-      to,
-      _tokenId,
-      tokenURI
-    );
+
     _communityTokens[msg.sender].push(_tokenId);
     _communityTokensIndex[_tokenId] = _communityTokens[msg.sender].length.sub(1);
     // Increase the quantities
     _tokenTemplates[_tokenId] = templateId;
     _templateQuantities[templateId] = _templateQuantities[templateId].add(1);
+
+    require(mintWithTokenURI(to, _tokenId, tokenURI), "Badge not minted");
+
     emit NewBadge(_tokenId, templateId, tokenURI);
     return _tokenId;
   }
 
   function burnBadge(uint256 tokenId) public {
     uint256 templateId = getBadgeTemplate(tokenId);
-    burn(tokenId);
     _templateQuantities[templateId] = _templateQuantities[templateId].sub(1);
+    burn(tokenId);
   }
 
     /// @notice ERC721 _transfer() Disabled
