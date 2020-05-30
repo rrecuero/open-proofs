@@ -104,7 +104,7 @@ contract Badges is Ownable, AccessControl, ERC721Burnable, ERC721Holder {
   */
   // cloned form OpenZeppelin v2.5
   modifier onlyMinter() {
-      require(hasRole(MINTER_ROLE, msg.sender), "Caller is not a minter");
+      require(isMinter(msg.sender), "Caller is not a minter");
       _;
     }
 
@@ -114,12 +114,18 @@ contract Badges is Ownable, AccessControl, ERC721Burnable, ERC721Holder {
     _;
   }
 
+  function isMinter(address account) public view returns (bool) {
+    return hasRole(MINTER_ROLE, account);
+  }
+
   function addMinter(address account) public onlyOwner returns (bool) {
+    require(!isMinter(account), "account is already a minter");
     grantRole(MINTER_ROLE, account);
     return true;
   }
 
   function removeMinter(address account) public onlyOwner returns (bool) {
+    require(isMinter(account), "account is not a minter");
     revokeRole(MINTER_ROLE, account);
     return true;
   }
