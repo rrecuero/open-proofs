@@ -1,4 +1,5 @@
-pragma solidity ^0.6.0;
+/// SPDX-License-Identifier: BSD-3-Clause
+pragma solidity 0.6.8;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Burnable.sol";
@@ -6,10 +7,9 @@ import "@openzeppelin/contracts/token/ERC721/ERC721Holder.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract Badges is Ownable, AccessControl, ERC721, ERC721Burnable, ERC721Holder {
+contract Badges is Ownable, AccessControl, ERC721Burnable, ERC721Holder {
 
   using SafeMath for uint256;
-  using Address for address;
 
   // Create a new role identifier for the minter role
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -91,6 +91,7 @@ contract Badges is Ownable, AccessControl, ERC721, ERC721Burnable, ERC721Holder 
     _registerInterface(_InterfaceId_ERC721Metadata);
     _registerInterface(_InterfaceId_ERC721);
     */
+    _setupRole(DEFAULT_ADMIN_ROLE, owner());
   }
   /* function toString() already included in OpenZeppelin v3.0.0 in /utils/Strings.sol
 
@@ -103,7 +104,7 @@ contract Badges is Ownable, AccessControl, ERC721, ERC721Burnable, ERC721Holder 
   */
   // cloned form OpenZeppelin v2.5
   modifier onlyMinter() {
-      require(hasRole(MINTER_ROLE, msg.sender), "Caller is not a minter");
+      require(isMinter(msg.sender), "Caller is not a minter");
       _;
     }
 
@@ -112,6 +113,23 @@ contract Badges is Ownable, AccessControl, ERC721, ERC721Burnable, ERC721Holder 
     require(templates[_templateId].owner == msg.sender, "You do not own this template");
     _;
   }
+
+  function isMinter(address account) public view returns (bool) {
+    return hasRole(MINTER_ROLE, account);
+  }
+
+  function addMinter(address account) public onlyOwner returns (bool) {
+    require(!isMinter(account), "account is already a minter");
+    grantRole(MINTER_ROLE, account);
+    return true;
+  }
+
+  function removeMinter(address account) public onlyOwner returns (bool) {
+    require(isMinter(account), "account is not a minter");
+    revokeRole(MINTER_ROLE, account);
+    return true;
+  }
+
   // cloned from OpenZeppelin v2.5
   function mintWithTokenURI(address to, uint256 tokenId, string memory tokenURI) public onlyMinter returns (bool) {
     _mint(to, tokenId);
@@ -163,9 +181,6 @@ contract Badges is Ownable, AccessControl, ERC721, ERC721Burnable, ERC721Holder 
     communities.push(_newCommunity);
     _communityId = communities.length.sub(1);
     _ownedCommunity[to] = _communityId;
-    if (!hasRole(MINTER_ROLE, to)) {
-      _setupRole(MINTER_ROLE, to);
-    }
     emit NewCommunity(_communityId, name, url);
     return _communityId;
   }
@@ -179,7 +194,6 @@ contract Badges is Ownable, AccessControl, ERC721, ERC721Burnable, ERC721Holder 
     communities.pop();
     // Can't remove the access here need to call it from somewhere else
     // _removeMinter(to);
-    revokeRole(MINTER_ROLE, to);
   }
 
   // Templates
@@ -252,60 +266,31 @@ contract Badges is Ownable, AccessControl, ERC721, ERC721Burnable, ERC721Holder 
     require(_templateQuantities[templateId] < templates[templateId].limit,
       "You have reached the limit of NFTs");
     _tokenId = totalSupply();
-    mintWithTokenURI(
-      to,
-      _tokenId,
-      tokenURI
-    );
+
     _communityTokens[msg.sender].push(_tokenId);
     _communityTokensIndex[_tokenId] = _communityTokens[msg.sender].length.sub(1);
     // Increase the quantities
     _tokenTemplates[_tokenId] = templateId;
     _templateQuantities[templateId] = _templateQuantities[templateId].add(1);
+
+    require(mintWithTokenURI(to, _tokenId, tokenURI), "Badge not minted");
+
     emit NewBadge(_tokenId, templateId, tokenURI);
     return _tokenId;
   }
 
   function burnBadge(uint256 tokenId) public {
     uint256 templateId = getBadgeTemplate(tokenId);
-    burn(tokenId);
     _templateQuantities[templateId] = _templateQuantities[templateId].sub(1);
+    burn(tokenId);
   }
 
-  function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal virtual override {
-    super._beforeTokenTransfer(from, to, tokenId);
-    require(!true, "ERC721: token transfer disabled");
-  }
-  /*
-  function transferFrom(
-    address from,
-    address to,
-    uint256 tokenId
-  )
-    public
-  {
-    require(1 != 0 , "Proof Badges transfers are disabled");
-  }
-
-  function safeTransferFrom(
-    address from,
-    address to,
-    uint256 tokenId
-  )
-    public
-  {
-    require(1 != 0 , "Proof Badges transfers are disabled");
-  }
-  function safeTransferFrom(
-    address from,
-    address to,
-    uint256 tokenId,
-    bytes memory _data
-  )
-    public
-  {
-    require(1 != 0 , "Proof Badges transfers are disabled");
-  }
-  */
+    /// @notice ERC721 _transfer() Disabled
+    /// @dev _transfer() has been overriden
+    /// @dev reverts on transferFrom() and safeTransferFrom()
+    function _transfer(address from, address to, uint256 tokenId) internal override {
+      require(!true, "ERC721: token transfer disabled");
+      super._transfer(from, to, tokenId);
+    }
 
 }
