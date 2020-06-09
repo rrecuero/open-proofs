@@ -1,5 +1,5 @@
 /// SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.6.8;
+pragma solidity 0.6.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721Holder.sol";
@@ -288,7 +288,7 @@ contract Badges is Ownable, AccessControl, ERC721Burnable, ERC721Holder {
     /// @dev _transfer() has been overriden
     /// @dev reverts on transferFrom() and safeTransferFrom()
     function _transfer(address from, address to, uint256 tokenId) internal override {
-      require(!true, "ERC721: token transfer disabled");
+      revert("ERC721: token transfer disabled");
       super._transfer(from, to, tokenId);
     }
 
